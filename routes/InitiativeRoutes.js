@@ -1,6 +1,3 @@
-const User = require("../schemas/userSchema.js");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const Router = require("express").Router();
 const dotenv = require("dotenv");
 const { isLoggedIn } = require("../middleware/auth.js");
