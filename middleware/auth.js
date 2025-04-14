@@ -19,7 +19,7 @@ const isLoggedIn = (req, res, next) => {
       return res.status(401).json({ message: "Invalid Token" });
     }
 
-    if (!decoded || !decoded.id || !decoded.name) {
+    if (!decoded || !decoded.id) {
       console.error("⚠️ Token decoded but missing required fields (id, name)");
       console.error("Decoded JWT:", decoded);
       return res.status(401).json({ message: "Unauthorized: Missing user data" });
