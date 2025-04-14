@@ -94,8 +94,9 @@ Router.get("/:id", async (req, res) => {
 // POST /api/initiatives
 Router.post("/", isLoggedIn, async (req, res) => {
   try {
-    const { title, category, description, location, coordinates, tags, status, website } = req.body;
+    const { title, category, description, location, coordinates, tagsInput, status, website } = req.body;
 
+    const tags = tagsInput ? tagsInput.split(",").map((tag) => tag.trim()) : [];
     // Validate required fields
     if (!title || !category || !description || !location) {
       return res.status(400).json({ message: "Please provide all required fields" });
@@ -120,7 +121,12 @@ Router.post("/", isLoggedIn, async (req, res) => {
 
     res.status(201).json(initiative);
   } catch (error) {
-    console.error("Error creating initiative:", error);
+    console.error("Error creating initiative:", {
+      message: error.message,
+      stack: error.stack,
+      requestBody: req.body,
+      user: req.user ? { id: req.user.id, name: req.user.name } : "Not authenticated",
+    });
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
