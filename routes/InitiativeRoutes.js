@@ -94,31 +94,11 @@ Router.get("/:id", async (req, res) => {
 // POST /api/initiatives
 Router.post("/", isLoggedIn, async (req, res) => {
   try {
-    const { title, category, description, location, tags, status, website } = req.body;
+    const { title, category, description, location, coordinates, tags, status, website } = req.body;
 
     // Validate required fields
     if (!title || !category || !description || !location) {
       return res.status(400).json({ message: "Please provide all required fields" });
-    }
-
-    // Geocode location to get coordinates
-    let coordinates;
-    try {
-      // Using a geocoding service like OpenStreetMap's Nominatim
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`
-      );
-
-      if (response.data && response.data.length > 0) {
-        coordinates = {
-          lat: parseFloat(response.data[0].lat),
-          lng: parseFloat(response.data[0].lon),
-        };
-      } else {
-        return res.status(400).json({ message: "Unable to geocode the provided location" });
-      }
-    } catch (error) {
-      return res.status(400).json({ message: "Geocoding failed", error: error.message });
     }
 
     // Create initiative
@@ -127,7 +107,7 @@ Router.post("/", isLoggedIn, async (req, res) => {
       category,
       description,
       location,
-      coordinates,
+      coordinates, // Directly use coordinates from frontend
       organizer: req.user.name, // From auth middleware
       tags,
       status: status || "Upcoming",
@@ -137,9 +117,6 @@ Router.post("/", isLoggedIn, async (req, res) => {
 
     // Save initiative
     await initiative.save();
-
-    // Optionally create a channel for this initiative
-    // This would depend on your Channel model implementation
 
     res.status(201).json(initiative);
   } catch (error) {
@@ -162,33 +139,14 @@ Router.put("/:id", isLoggedIn, async (req, res) => {
       return res.status(401).json({ message: "Not authorized to update this initiative" });
     }
 
-    const { title, category, description, location, tags, status, website } = req.body;
-
-    // Check if location changed, if so, geocode again
-    if (location && location !== initiative.location) {
-      try {
-        const response = await axios.get(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`
-        );
-
-        if (response.data && response.data.length > 0) {
-          initiative.coordinates = {
-            lat: parseFloat(response.data[0].lat),
-            lng: parseFloat(response.data[0].lon),
-          };
-        } else {
-          return res.status(400).json({ message: "Unable to geocode the provided location" });
-        }
-      } catch (error) {
-        return res.status(400).json({ message: "Geocoding failed", error: error.message });
-      }
-    }
+    const { title, category, description, location, coordinates, tags, status, website } = req.body;
 
     // Update fields
     if (title) initiative.title = title;
     if (category) initiative.category = category;
     if (description) initiative.description = description;
     if (location) initiative.location = location;
+    if (coordinates) initiative.coordinates = coordinates;
     if (tags) initiative.tags = tags;
     if (status) initiative.status = status;
     if (website !== undefined) initiative.website = website;
