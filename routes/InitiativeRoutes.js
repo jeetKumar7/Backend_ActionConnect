@@ -7,6 +7,9 @@ dotenv.config();
 
 // GET /api/initiatives
 Router.get("/", async (req, res) => {
+  const requestId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+  console.log(`[${requestId}] Initiatives GET request received with query:`, req.query);
+
   try {
     // Add query parameters for filtering
     const { category, status, search, tags } = req.query;
@@ -23,14 +26,50 @@ Router.get("/", async (req, res) => {
       filter.tags = { $in: tagArray };
     }
 
+    console.log(`[${requestId}] Executing Initiative.find with filters:`, JSON.stringify(filter));
+
     const initiatives = await Initiative.find(filter)
       .populate("createdBy", "name profileImage")
       .sort({ createdAt: -1 });
 
+    console.log(`[${requestId}] Successfully retrieved ${initiatives.length} initiatives`);
     res.json(initiatives);
   } catch (error) {
-    console.error("Error fetching initiatives:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    const timestamp = new Date().toISOString();
+
+    // Detailed error logging
+    console.error(`[${timestamp}] [${requestId}] Error fetching initiatives:`, {
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorCode: error.code,
+      errorName: error.name,
+      query: req.query,
+    });
+
+    // Specific error handling
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        message: "Invalid query parameter format",
+        requestId,
+        details: error.message,
+      });
+    }
+
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Validation error in request",
+        requestId,
+        details: error.message,
+      });
+    }
+
+    // Generic server error
+    res.status(500).json({
+      message: "Server error while fetching initiatives",
+      requestId,
+      error: error.message,
+      timestamp,
+    });
   }
 });
 
