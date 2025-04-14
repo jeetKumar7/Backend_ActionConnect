@@ -113,7 +113,6 @@ Router.post("/", isLoggedIn, async (req, res) => {
       category,
       description,
       location,
-      coordinates,
       organizer: req.user.name,
       createdBy: req.user.id,
       tags,
@@ -148,14 +147,14 @@ Router.put("/:id", isLoggedIn, async (req, res) => {
       return res.status(401).json({ message: "Not authorized to update this initiative" });
     }
 
-    const { title, category, description, location, coordinates, tags, status, website } = req.body;
+    const { title, category, description, location, tags, status, website } = req.body;
 
     // Update fields
     if (title) initiative.title = title;
     if (category) initiative.category = category;
     if (description) initiative.description = description;
     if (location) initiative.location = location;
-    if (coordinates) initiative.coordinates = coordinates;
+
     if (tags) initiative.tags = tags;
     if (status) initiative.status = status;
     if (website !== undefined) initiative.website = website;
