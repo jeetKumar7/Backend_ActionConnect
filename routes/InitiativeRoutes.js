@@ -109,11 +109,11 @@ Router.post("/", isLoggedIn, async (req, res) => {
     }
 
     const initiative = new Initiative({
-      title,
-      category,
-      description,
-      location,
-      organizer: req.user.name,
+      title: title.trim(),
+      category: category.trim(),
+      description: description.trim(),
+      location: location.trim(),
+      organizer: req.user.name || "Anonymous",
       createdBy: req.user.id,
       tags,
       status: status || "Upcoming",
@@ -123,12 +123,12 @@ Router.post("/", isLoggedIn, async (req, res) => {
     await initiative.save();
     res.status(201).json(initiative);
   } catch (error) {
-    console.error("❌ Error creating initiative:", {
-      message: error.message,
-      stack: error.stack,
-      requestBody: req.body,
-      user: req.user || "Not authenticated",
-    });
+    console.error("❌ Error creating initiative:");
+    console.error("Message:", error.message);
+    console.error("Stack:", error.stack);
+    console.error("Request Body:", req.body);
+    console.error("User:", req.user || "Not authenticated");
+
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
