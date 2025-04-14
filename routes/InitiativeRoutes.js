@@ -92,42 +92,43 @@ Router.get("/:id", async (req, res) => {
 });
 
 // POST /api/initiatives
-Router.post("/", async (req, res) => {
+Router.post("/", isLoggedIn, async (req, res) => {
   console.log("🚀 Initiative POST route hit");
 
   try {
     const { title, category, description, location, coordinates, tagsInput, status, website } = req.body;
 
+    if (!req.user || !req.user.name || !req.user.id) {
+      return res.status(401).json({ message: "Unauthorized: Missing user data" });
+    }
+
     const tags = tagsInput ? tagsInput.split(",").map((tag) => tag.trim()) : [];
-    // Validate required fields
+
     if (!title || !category || !description || !location) {
       return res.status(400).json({ message: "Please provide all required fields" });
     }
 
-    // Create initiative
     const initiative = new Initiative({
       title,
       category,
       description,
       location,
-      coordinates, // Directly use coordinates from frontend
-      organizer: req.user.name, // From auth middleware
+      coordinates,
+      organizer: req.user.name,
+      createdBy: req.user.id,
       tags,
       status: status || "Upcoming",
       website: website || "",
-      createdBy: req.user.id,
     });
 
-    // Save initiative
     await initiative.save();
-
     res.status(201).json(initiative);
   } catch (error) {
-    console.error("Error creating initiative:", {
+    console.error("❌ Error creating initiative:", {
       message: error.message,
       stack: error.stack,
       requestBody: req.body,
-      user: req.user ? { id: req.user.id, name: req.user.name } : "Not authenticated",
+      user: req.user || "Not authenticated",
     });
     res.status(500).json({ message: "Server error", error: error.message });
   }
