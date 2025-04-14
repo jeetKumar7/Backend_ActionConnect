@@ -98,7 +98,7 @@ Router.post("/", isLoggedIn, async (req, res) => {
   try {
     const { title, category, description, location, coordinates, tagsInput, status, website } = req.body;
 
-    if (!req.user.id) {
+    if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Unauthorized: Missing user data" });
     }
 
