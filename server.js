@@ -11,10 +11,12 @@ const userRouter = require("./routes/userRoutes");
 const postRouter = require("./routes/postRoutes");
 const channelRouter = require("./routes/channelRoutes");
 const messageRouter = require("./routes/messageRoutes");
+const InitiativeRouter = require("./routes/InitiativeRoutes");
 const actionHubRouter = require("./routes/actionHubRoutes");
 const configurePassport = require("./passportConfig");
 const passport = require("passport");
 const session = require("express-session");
+const { init } = require("./schemas/messageSchema.js");
 
 const app = express();
 
@@ -81,3 +83,4 @@ app.use("/api/posts", postRouter);
 app.use("/api/channels", channelRouter);
 app.use("/api/actionhub", actionHubRouter);
 app.use("/api/messages", messageRouter);
+app.use("/api/initiative", InitiativeRouter);
