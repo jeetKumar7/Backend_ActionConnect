@@ -93,6 +93,8 @@ Router.get("/:id", async (req, res) => {
 
 // POST /api/initiatives
 Router.post("/", isLoggedIn, async (req, res) => {
+  console.log("🚀 Initiative POST route hit");
+
   try {
     const { title, category, description, location, coordinates, tagsInput, status, website } = req.body;
 
