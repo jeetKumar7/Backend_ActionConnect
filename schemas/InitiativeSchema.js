@@ -50,7 +50,6 @@ const InitiativeSchema = new mongoose.Schema(
     },
     nextEvent: {
       type: Date,
-      required: true,
     },
     joinedUsers: [
       {
