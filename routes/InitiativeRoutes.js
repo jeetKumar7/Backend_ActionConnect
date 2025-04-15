@@ -114,6 +114,7 @@ Router.post("/", isLoggedIn, async (req, res) => {
       description: description.trim(),
       location: location.trim(),
       organizer: req.body.organizer || req.user.name || "Anonymous",
+      nextEvent: req.body.nextEvent,
 
       createdBy: req.user.id,
       tags,
