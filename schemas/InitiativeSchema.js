@@ -48,6 +48,10 @@ const InitiativeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Channel",
     },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
     joinedUsers: [
       {
         type: mongoose.Schema.Types.ObjectId,
