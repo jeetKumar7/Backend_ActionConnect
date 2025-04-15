@@ -48,7 +48,7 @@ const InitiativeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Channel",
     },
-    date: {
+    nextEvent: {
       type: Date,
       default: Date.now,
     },
